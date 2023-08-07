@@ -1,0 +1,177 @@
+body {
+  color: #FFFFFF;
+  background-color: #000000;
+}
+
+li {
+  content: "\2022";
+  color: red;
+}
+
+.brightWhite{
+  color:#FFFFFF;
+}
+
+
+
+.closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+}
+
+.fullWidthFulllHeight{
+  width: 100%;
+  height: 100%;
+}
+
+.plusOneTextSize{
+  size: +1;
+}
+
+.redText{
+  color: #FF0000;
+}
+
+.orangeText{
+  color: #FF8000
+}
+
+.rightAlighText{
+  text-align: right;
+}
+
+.leftAlighText{
+  text-align: left;
+}
+
+.centerText{
+  text-align: center;
+}
+
+.centerElement {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+ }
+
+html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+}
+
+.sunicon{
+  position: fixed;
+  margin: 0 0 0 0;
+  font-size:60px;
+  cursor:pointer;
+  color:#FF8000;
+  z-index: 2; 
+}
+
+.hamburgericon{
+  position: fixed;
+  margin: 0 0 0 22px;
+  font-size:60px;
+  cursor:pointer;
+  color:#FF8000;
+  z-index: 3; 
+}
+
+
+.titleStyle{
+  position: fixed;
+//  margin: 20px 0 0 120px;
+left: 25%;
+  font-size: 32px;
+  cursor:pointer;
+  color:#FF0000;
+  z-index: 4 
+}
+
+.hamburgerIconMargin{
+  margin-left: 75px;
+}
+
+
+
+.paragraphWrap {
+  width: 60%;
+}
+
+
+@media only screen and (orientation:portrait) {
+  /* For mobile phones: */
+  .hamburgerIconMargin{
+    margin-left: 0;
+  }
+
+  .paragraphWrap {
+    width: 100%;
+  }
+}
+
+
+.sidenavMenuStyle {
+  display: none;
+  height: 100%;
+  width: 25%;
+  font-size:25px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #000000FF; /*same as background-color:rgba(0, 0, 0, 1.0);*/
+  overflow-x: hidden;
+  border-width:1px;
+  border-style: solid;
+  border-color: red;
+/*    z-index: 2;  */
+  cursor: pointer;
+}
+
+@media only screen and (orientation:portrait) {
+  /* For mobile phones: */
+  .sidenavMenuStyle {
+   /* display: none; */
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #000000FF; /*same as background-color:rgba(0, 0, 0, 1.0);*/
+    overflow-x: hidden;
+    border-width:1px;
+    border-style: solid;
+    border-color: red;
+/*    z-index: 2;  */
+    cursor: pointer;
+  }
+}
+
+
+
+.sidenavMenuStyle a {
+  text-decoration: none;
+  font-size: 25px;
+ // color: #FF8000;
+  display: block;
+}
+
+
+.sidenavMenuStyle a:visited {
+  color: #FF00FF;
+}
+
+.sidenavMenuStyle a:link {
+  color: #0000FF;
+}
+
+.sidenavMenuStyle a:hover {
+  color: #FF0000;
+}

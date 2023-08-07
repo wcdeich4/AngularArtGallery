@@ -1,0 +1,1 @@
+make CameraShip a typedef instead of class (for practice)

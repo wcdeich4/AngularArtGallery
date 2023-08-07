@@ -1,0 +1,27 @@
+<form [formGroup]="displayForm" class="displaySelectMenu" (ngSubmit)="onDisplayChange()">
+    <select id="displaySelect" formControlName="displaySelect" >
+        <option value="FernDots">Fern Dots</option>
+        <option value="FernLines">Fern Lines</option>
+        <option value="SirpinskiTriangle">SirpinskiTriangle</option>
+        <option value="Mandelbrot">Mandelbrot</option>
+    </select>
+<button  type="submit">Display</button>
+</form>
+<canvas id="CanvasID"></canvas>
+
+
+<!--
+<img id="hiddenImageElementID" SRC="../../assets/sun.png" BORDER=0 style="display: none;">
+<canvas id="hiddenCanvasID" BORDER=0 style="display: none;"></canvas>
+
+
+find that link about adding a hidden image in js to make canvas.drawimage work 
+
+
+??
+https://stackoverflow.com/questions/7932759/dom-appendchild-to-insert-images
+
+https://stackoverflow.com/questions/22191576/javascript-createelement-and-setattribute
+https://bobbyhadz.com/blog/javascript-create-element-with-attributes
+
+-->
