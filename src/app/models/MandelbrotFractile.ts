@@ -2,6 +2,8 @@ import { MathCanvas2D } from "./MathCanvas2D";
 import { Fractile } from "./Fractile";
 import { Range2D } from "../math/Range2D";
 import { ComplexNumber } from "../math/ComplexNumber";
+import { Coordinate2D } from "./Coordinate2D";
+import { ISize2D } from "./ISize2D";
 
 export class MandelbrotFractile extends Fractile
 {
@@ -81,18 +83,26 @@ export class MandelbrotFractile extends Fractile
         {
             console.log('this.worker != null');
 
+           // const limits0: ISize2D = new ISize2D(); //error
+           // limits.width = mathCanvas.getWidth();
+           // limits.height = mathCanvas.getHeight();
+           const limits: ISize2D = { width: mathCanvas.getWidth(), height: mathCanvas.getHeight() };
 
+            this.worker.postMessage( JSON.stringify( limits  ) );
+
+            
+/*
             const width = mathCanvas.getWidth();
             const height = mathCanvas.getHeight();
-            let world2DComplexCoordinates: ComplexNumber = null;
+            let world2DCoordinates: Coordinate2D = null;
             for (let w = 0; w < width; w++)
             {
                 for (let h = 0; h < height; h++) 
                 {
-                   world2DComplexCoordinates = mathCanvas.canvasToWorld2DComplex(w, h);
+                    world2DCoordinates = mathCanvas.canvasToWorld2DCoordinates(w, h);
 
     
-                this.worker.postMessage( JSON.stringify( { coordinate: world2DComplexCoordinates } )  );
+                    this.worker.postMessage( JSON.stringify( world2DCoordinates  ) );
     
                    
     
@@ -101,7 +111,11 @@ export class MandelbrotFractile extends Fractile
                 }
     
                 
-            } 
+            }
+
+
+        */
+
         }
 
 

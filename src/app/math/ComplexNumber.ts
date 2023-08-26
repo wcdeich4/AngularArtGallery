@@ -1,3 +1,4 @@
+import { Coordinate2D } from '../models/Coordinate2D';
 import { EquatableWithTolerance } from './EquatableWithTolerance';
 import { ICloneable } from './ICloneable';
 export class ComplexNumber extends EquatableWithTolerance implements ICloneable<ComplexNumber>
@@ -10,14 +11,33 @@ export class ComplexNumber extends EquatableWithTolerance implements ICloneable<
     /**
      * ComplexNumber constructor. Note: If you do not know the initial values desired, you can create use new ComplexNumber(0,0)
      * @constructor
-     * @param {number} realPart - real component .
-     * @param {number} b - imaginary component.
+     * @param {number} a - real component
+     * @param {number} b - imaginary component
      */
-    constructor(realPart: number, b: number)
+    constructor(a: number, b: number)
     {
         super();
-        this.realPart = realPart;
+        this.set(a, b);
+    }
+
+    /**
+     * Set real part and imaginary part
+     * @param {number} a - real component
+     * @param {number} b - imaginary component
+     */
+    public set(a: number, b: number): void
+    {
+        this.realPart = a;
         this.imaginaryPart = b;
+    }
+
+    /**
+     * set by Coordinate2D object
+     * @param {Coordinate2D} coordinate 
+     */
+    public setFromCoordinate(coordinate: Coordinate2D): void
+    {
+        this.set(coordinate.x, coordinate.y);
     }
 
     /**
@@ -60,7 +80,7 @@ export class ComplexNumber extends EquatableWithTolerance implements ICloneable<
         //TODO : parse json
         else if (obj instanceof ComplexNumber)
         {
-            return (Math.abs(this.realPart - obj.realPart) <= this.Tolerance) && (Math.abs(this.imaginaryPart - obj.imaginaryPart) <= this.Tolerance);
+            return (Math.abs(this.realPart - obj.realPart) <= EquatableWithTolerance.Tolerance) && (Math.abs(this.imaginaryPart - obj.imaginaryPart) <= EquatableWithTolerance.Tolerance);
         }
         else
         {
@@ -180,34 +200,44 @@ export class ComplexNumber extends EquatableWithTolerance implements ICloneable<
         return result;
     }
 
-        /***
-         * Square this complex number. Becasue there are so many formulas that specifically involve squaring, a function that raises to the 2nd power specifically is very useful. 
-         */
-        public square(): void
-        {
-            //can't update this.realPart yet because the original this.realPart is also in the formula for this.imaginaryPart
-            const newRealPart = this.realPart * this.realPart - this.imaginaryPart * this.imaginaryPart;
-            this.imaginaryPart = this.realPart * this.imaginaryPart + this.realPart * this.imaginaryPart;
-            this.realPart = newRealPart;
-        }
+    /***
+     * Square this complex number. Becasue there are so many formulas that specifically involve squaring, a function that raises to the 2nd power specifically is very useful. 
+     */
+    public square(): void
+    {
+        //can't update this.realPart yet because the original this.realPart is also in the formula for this.imaginaryPart
+        const newRealPart = this.realPart * this.realPart - this.imaginaryPart * this.imaginaryPart;
+        this.imaginaryPart = this.realPart * this.imaginaryPart + this.realPart * this.imaginaryPart;
+        this.realPart = newRealPart;
+    }
 
-        /**
-         * Get a new ComplexNumber object equal to this ComplexNumber object without changing this ComplexNumber object.
-         * @returns {ComplexNumber} equal to this complex number squared.
-         */
-        public getSquared(): ComplexNumber
-        {
-            let result = this.clone();
-            result.square();
-            return result;
-        }
+    /**
+     * Get a new ComplexNumber object equal to this ComplexNumber object without changing this ComplexNumber object.
+     * @returns {ComplexNumber} equal to this complex number squared.
+     */
+    public getSquared(): ComplexNumber
+    {
+        let result = this.clone();
+        result.square();
+        return result;
+    }
+
+    /**
+     * Get magnitude / radius length of this complex number on the complex plane squared.  A bit of a hack, but more efficient
+     * @returns {number} magnitude
+     */
+    public magnitudeSquared(): number
+    {
+        return this.realPart * this.realPart + this.imaginaryPart * this.imaginaryPart;
+    }
 
     /**
      * Get magnitude / radius length of this complex number on the complex plane
      * @returns {number} magnitude
      */
-    public magnitude(): number{
-        return Math.sqrt(this.realPart * this.realPart + this.imaginaryPart * this.imaginaryPart);
+    public magnitude(): number
+    {
+        return Math.sqrt(this.magnitudeSquared());
     }
 
     /**

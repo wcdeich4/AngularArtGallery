@@ -5,6 +5,7 @@ import { IMathDrawable } from './IMathDrawable';
 import { Vector2D } from '../math/Vector2D';
 import { ComplexNumber } from '../math/ComplexNumber';
 import { Pixel } from './Pixel';
+import { Coordinate2D } from './Coordinate2D';
 
 export class MathCanvas2D
 {
@@ -15,6 +16,7 @@ export class MathCanvas2D
     public yAxisColor: string | CanvasGradient | CanvasPattern = 'white';
     public mostRecentCanvasToWorld2DVector: GenericVector<number>;
     public mostRecentCanvasToWorld2DComplex: ComplexNumber;
+    public mostRecentCoordinate2D: Coordinate2D;
 
     public drawableArray: Array<IMathDrawable> = new Array<IMathDrawable>();
     
@@ -42,6 +44,7 @@ export class MathCanvas2D
         }
         this.mostRecentCanvasToWorld2DVector = new Vector2D();
         this.mostRecentCanvasToWorld2DComplex = new ComplexNumber(0, 0);
+        this.mostRecentCoordinate2D = new Coordinate2D();  //TODO:  switch to only this.mostRecentCoordinate2D
     }
 
     /**
@@ -385,6 +388,19 @@ export class MathCanvas2D
         this.mostRecentCanvasToWorld2DComplex.realPart = x / this.xAspectRatio - Math.abs(this.range.xMin);
         this.mostRecentCanvasToWorld2DComplex.imaginaryPart = Math.abs(this.range.yMin) - y / this.yAspectRatio  ;
         return this.mostRecentCanvasToWorld2DComplex;
+    }
+
+    /**
+     * Get the 2D world canvas x and y co-ordinates
+     * @param x {number} canvas x co-ordinate
+     * @param y {number} canvas y co-ordinate
+     * @returns {Coordinate2D} world 2D co-ordinate
+     */
+    public canvasToWorld2DCoordinates(x: number, y: number): Coordinate2D
+    {
+        this.mostRecentCoordinate2D.x = x / this.xAspectRatio - Math.abs(this.range.xMin);
+        this.mostRecentCoordinate2D.y = Math.abs(this.range.yMin) - y / this.yAspectRatio  ;
+        return this.mostRecentCoordinate2D;
     }
 
 

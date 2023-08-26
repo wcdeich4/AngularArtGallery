@@ -1,3 +1,4 @@
+import { EquatableWithTolerance } from './EquatableWithTolerance';
 import { GenericMatrix } from './GenericMatrix';
 import { GenericVector } from './GenericVector';
 import { ICloneable } from './ICloneable';
@@ -260,7 +261,7 @@ export class RealNumberMatrix extends GenericMatrix<number> implements ICloneabl
                                 for(let col = 0; col < this.elements[row].length ; col++)
                                 {
                                     absoluteDifference = Math.abs(this.elements[row][col] - otherMatrix.elements[row][col]);
-                                    if (absoluteDifference > this.Tolerance)
+                                    if (absoluteDifference > EquatableWithTolerance.Tolerance)
                                     {
                                         return false;
                                     }

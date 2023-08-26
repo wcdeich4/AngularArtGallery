@@ -1,3 +1,4 @@
+import { EquatableWithTolerance } from "./EquatableWithTolerance";
 import { GenericVector } from "./GenericVector";
 import { ICloneable } from "./ICloneable";
 
@@ -271,7 +272,7 @@ export class RealNumberVector extends GenericVector<number> implements ICloneabl
                     result = true;
                     for(let i = 0; i < this.elements.length; i++ )
                     {
-                        if (Math.abs(this.elements[i] - obj.elements[i]) > this.Tolerance)
+                        if (Math.abs(this.elements[i] - obj.elements[i]) > EquatableWithTolerance.Tolerance)
                         {
                             result = false;
                             break;
