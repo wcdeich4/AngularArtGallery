@@ -5,7 +5,7 @@ import { ajax } from 'rxjs/ajax';
 // import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 // import { MTLLoader } from  'three/examples/jsm/loaders/MTLLoader.js';
 // import { OBJHelper } from '../helpers/OBJHelper';
-import { StringHelper } from '../helpers/StringHelper';
+import { StringHelper } from '../sharedtools/helpers/StringHelper';
 
 @Component({
   selector: 'app-manualtesting',

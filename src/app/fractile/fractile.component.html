@@ -1,12 +1,17 @@
-<form [formGroup]="displayForm" class="displaySelectMenu" (ngSubmit)="onDisplayChange()">
-    <select id="displaySelect" formControlName="displaySelect" >
+<form [formGroup]="displayForm" class="displaySelectFormStyle" (ngSubmit)="onDisplayChange()" >
+    <button   type="button" class="displaySlectElementStyle" (click)="stop()">
+        <img src="../../assets/stop.png" alt="Stop" class="displaySlectElementStyle"  />  
+        </button>
+    <select id="displaySelect" formControlName="displaySelect" class="displaySlectElementStyle" >
         <option value="FernDots">Fern Dots</option>
         <option value="FernLines">Fern Lines</option>
         <option value="SirpinskiTriangle">SirpinskiTriangle</option>
         <option value="Mandelbrot">Mandelbrot</option>
     </select>
-<button  type="submit">Display</button>
+<button  type="submit" class="displaySlectElementStyle" >Draw</button>
+
 </form>
+
 <canvas id="CanvasID"></canvas>
 
 

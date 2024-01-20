@@ -12,6 +12,7 @@ import { CalculusComponent } from './calculus/calculus.component';
 import { Art2DComponent } from './art2-d/art2-d.component';
 import { EmailComponent } from './email/email.component'
 import { PhotosComponent } from './photos/photos.component'
+import { ZxyComponent } from './zxy/zxy.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'manualtesting', component: ManualtestingComponent },
   { path: 'art2d', component: Art2DComponent },
+  { path: 'zxy', component: ZxyComponent },
   { path: 'canvas', component: Canvas2DComponent },
   { path: 'calculus', component: CalculusComponent },
   { path: 'fractile', component: FractileComponent },

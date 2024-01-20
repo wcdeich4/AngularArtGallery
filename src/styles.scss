@@ -76,10 +76,19 @@ html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquot
 .hamburgericon{
   position: fixed;
   margin: 0 0 0 22px;
-  font-size:60px;
+  font-size:64px;
   cursor:pointer;
   color:#FF8000;
   z-index: 3; 
+}
+
+.settingsGearIcon{
+  position: fixed;
+  margin: 0 0 0 82px;
+  font-size:60px;
+  cursor:pointer;
+  filter: invert(52%) sepia(51%) saturate(3615%) hue-rotate(2deg) brightness(107%) contrast(104%);
+  z-index: 4; 
 }
 
 
@@ -90,7 +99,7 @@ left: 25%;
   font-size: 32px;
   cursor:pointer;
   color:#FF0000;
-  z-index: 4 
+  z-index: 5;
 }
 
 .hamburgerIconMargin{
@@ -174,4 +183,11 @@ left: 25%;
 
 .sidenavMenuStyle a:hover {
   color: #FF0000;
+}
+
+.inputFormClass{
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  right: 0;
 }

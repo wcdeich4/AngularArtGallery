@@ -14,6 +14,7 @@ import { CalculusComponent } from './calculus/calculus.component';
 import { Art2DComponent } from './art2-d/art2-d.component';
 import { PhotosComponent } from './photos/photos.component';
 import { EmailComponent } from './email/email.component';
+import { ZxyComponent } from './zxy/zxy.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { EmailComponent } from './email/email.component';
     CalculusComponent,
     Art2DComponent,
     PhotosComponent,
-    EmailComponent
+    EmailComponent,
+    ZxyComponent
   ],
   imports: [
     FormsModule,

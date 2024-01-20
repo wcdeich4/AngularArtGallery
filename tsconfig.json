@@ -5,12 +5,14 @@
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": false,
     "strict": false,
+    "esModuleInterop": true,
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2017",
@@ -25,5 +27,19 @@
     "strictInjectionParameters": false,
     "strictInputAccessModifiers": false,
     "strictTemplates": false
-  }
+  },
+
+  "exclude": [
+    "public",
+    "dist",
+    "node_modules",
+    "src/app/sharedtools/vite.config.ts",
+    "src/app/sharedtools/script.js",
+    "src/app/sharedtools/package.json",
+    "src/app/sharedtools/tsconfig.json",
+    "src/app/sharedtools/env.d.ts",
+    "src/app/sharedtools/node_modules",
+    "src/app/sharedtools/dist",
+    "src/app/sharedtools/public",
+  ]
 }

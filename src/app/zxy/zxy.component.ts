@@ -11,23 +11,40 @@ import { I2DEquation } from '../sharedtools/math/I2DEquation';
 import { JavascriptStringEvaluator } from '../sharedtools/math/JavascriptStringEvaluator';
 import { RealNumberVector } from '../sharedtools/math/RealNumberVector';
 import { Derivative2 } from '../sharedtools/math/Derivative2';
+import { RealNumberMatrix } from '../sharedtools/math/RealNumberMatrix';
+
 @Component({
-  selector: 'app-calculus',
+  selector: 'app-zxy',
   providers: [Location, {provide: LocationStrategy, useClass: HashLocationStrategy}],
-  templateUrl: './calculus.component.html',
-  styleUrls: ['./calculus.component.scss'],
+  templateUrl: './zxy.component.html',
+  styleUrls: ['./zxy.component.scss'],
   host: {
     '(window:resize)': 'onresize($event)'
   }
 })
-export class CalculusComponent implements OnInit 
+export class ZxyComponent implements OnInit 
 {
   private equation: JavascriptStringEvaluator;
-  private equationTextValidator: CrossSiteScriptValidator;
- // private equationText: string;
+  private equation3dTextValidator: CrossSiteScriptValidator;
   private mathCanvas: MathCanvas2D;
+
+  private transformMatrix: RealNumberMatrix;
+  private XLOW: number;
+  private XHIGH: number;
+  private YLOW: number;
+  private YHIGH: number;
+  private XNumberOfLines: number;
+  private YNumberOfLines: number;
+  // :Input "#X Lines:",XRES
+  // :Input "#Y Lines:",YRES
+  // :(XHIGH-XLOW)/XRES->XRES
+  // :(YHIGH-YLOW)/YRES->YRES
+
   public inputForm!: FormGroup;
   location: Location;
+
+
+
   constructor(location: Location)
   {
     this.location = location;
@@ -41,12 +58,14 @@ export class CalculusComponent implements OnInit
 
   ngOnInit(): void 
   {
-    this.equationTextValidator = new CrossSiteScriptValidator();
+//    this.transformMatrix = new RealNumberMatrix();
+
+    this.equation3dTextValidator = new CrossSiteScriptValidator();
     this.inputForm  = new FormGroup({
-      equationTextBox: new FormControl(
+      equation3dTextBox: new FormControl(
         null,
-        [Validators.required, this.equationTextValidator.containsForbiddenKeyWord /* .bind(this.equationTextValidator) not needed if containsForbiddenKeyWord is defined by lambda function */ ],
-        this.equationTextValidator.validate
+        [Validators.required, this.equation3dTextValidator.containsForbiddenKeyWord /* .bind(this.equation3dTextValidator) not needed if containsForbiddenKeyWord is defined by lambda function */ ],
+        this.equation3dTextValidator.validate
       )
     });
 
@@ -104,9 +123,60 @@ export class CalculusComponent implements OnInit
 
   public draw(): void
   {
+    //change to set?
+//    this.transformMatrix = RealNumberMatrix.getLookAtMatrix()
+
+
+    //TODO: use derivative to find interesting lines
+    //      decide what to do for exceptions
+
+    let Z: number;
+    let YNext: number;
+    let V0: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    let V1: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    let V2: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    let V3: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    let XRES = (this.XHIGH - this.XLOW)/this.XNumberOfLines;
+    let YRES = (this.YHIGH - this.YLOW)/this.YNumberOfLines;
+    for (let Y = this.YLOW; Y < this.YHIGH; Y += YRES)
+    {
+      for (let X = this.XLOW; X <  this.XHIGH; X += XRES )
+      {
+        try 
+        {
+          Z = this.equation.evaluateAtXY(X, Y);
+          V0.set(X, Y, Z);
+          X += XRES / 4;
+
+          Z = this.equation.evaluateAtXY(X, Y);
+          V1.set(X, Y, Z);
+          X += XRES / 4;
+
+          Z = this.equation.evaluateAtXY(X, Y);
+          V2.set(X, Y, Z);
+          X += XRES / 4;
+
+          Z = this.equation.evaluateAtXY(X, Y);
+          V3.set(X, Y, Z);
+          X += XRES / 4;
+
+          
+
+
+        } 
+        catch (error)
+        {
+          
+        }
+
+
+        
+      }
+      
+    }
 
     this.mathCanvas.emptyDrawableArray();
-    this.mathCanvas.drawableArray.push(this.equation);
+    this.mathCanvas.drawableArray.push(this.equation); //???????
 
    // this.equation.draw(this.mathCanvas);
 
@@ -125,31 +195,21 @@ export class CalculusComponent implements OnInit
 
   public onInputSubmit(): void
   {
-    if ((this.inputForm.controls.equationTextBox.value != null) && (this.inputForm.controls.equationTextBox.errors == null))
+    if ((this.inputForm.controls.equation3dTextBox.value != null) && (this.inputForm.controls.equation3dTextBox.errors == null))
     {
       let JavascriptStringEvaluator: JavascriptStringEvaluator = this.equation as JavascriptStringEvaluator;
-      JavascriptStringEvaluator.functionToEvaluate = this.inputForm.controls.equationTextBox.value;
+      JavascriptStringEvaluator.functionToEvaluate = this.inputForm.controls.equation3dTextBox.value;
       this.mathCanvas.Erase();
 
       this.draw();
-     
-      console.log(
-        //    this.sanitizer.sanitize(SecurityContext.SCRIPT,
-           this.inputForm.controls.equationTextBox.value
-        //  )
-           );
+     // console.log("error: " + this.inputForm.controls.equation3dTextBox.errors);
+     // console.log;
     }
-    else
+
+    else if (this.inputForm.controls.equation3dTextBox.errors?.equation3dTextBoxIsInvalid)
     {
-      if (this.inputForm.controls.equationTextBox.errors?.equationTextBoxIsInvalid)
-      {
-        alert('Do not inject cross site scripts into the equation text box');
-      }
-
-      console.log("error: " + this.inputForm.controls.equationTextBox.errors);
+      alert('Do not inject cross site scripts into the equation text box'); 
     }
-
-    
 
 
 

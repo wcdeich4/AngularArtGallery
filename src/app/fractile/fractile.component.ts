@@ -1,12 +1,15 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Fractile } from '../models/Fractile';
-import { MathCanvas2D } from '../models/MathCanvas2D'
-import { SirpinskiTriangleFractile } from '../models/SirpinskiTriangleFractle';
-import { FernDotFractile } from '../models/FernDotFractile';
-import { FernLineFractile } from '../models/FernLineFractile';
-import { MandelbrotFractile } from '../models/MandelbrotFractile';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Fractile } from '../sharedtools/models/Fractile';
+import { MathCanvas2D } from '../sharedtools/models/MathCanvas2D'
+import { SirpinskiTriangleFractile } from '../sharedtools/models/SirpinskiTriangleFractle';
+import { FernDotFractile } from '../sharedtools/models/FernDotFractile';
+import { FernLineFractile } from '../sharedtools/models/FernLineFractile';
+import { MandelbrotFractile } from '../sharedtools/models/MandelbrotFractile';
+
+//the "this" keyword means something different in HTML window events like resize and onclick, and binding this was not successful
+var globalReferanceToThisComponent = null;
 
 @Component({
   selector: 'app-fractile',
@@ -18,7 +21,8 @@ export class FractileComponent implements OnInit, AfterViewInit
 {
   private fractileMap: Map<string, Fractile>;
   private selectedFractileToDisplay: string;
-  private mathCanvas: MathCanvas2D;
+  private mathCanvas: MathCanvas2D = null;
+  private htmlCanvasElement: HTMLCanvasElement = null;
   private canvasRenderingContext2D: CanvasRenderingContext2D;
   private overlayImageElement: HTMLImageElement;  //HTMLElement; ////ImageBitmap
   public displayForm!: FormGroup;
@@ -28,54 +32,88 @@ export class FractileComponent implements OnInit, AfterViewInit
   {
     this.location = location;
 
+    globalReferanceToThisComponent =  this;
+
     this.overlayImageElement =  document.createElement("img"); //new Image();  //document.getElementById('hiddenImageElementID') as HTMLImageElement;
     this.overlayImageElement.setAttribute("id", "hiddenImageElementID");
     this.overlayImageElement.src = `../../assets/sun.png`;  //Smile.gif`;  //proves texture uv origin is upper lefthand corner like images
  //   document.body.appendChild(this.overlayImageElement); //slows constructor & not needed in Chromium or Firefox
     this.overlayImageElement.style.display = 'none';
+
+    //it may be null here, so set again later
+    this.htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
+
+    this.fractileMap = new Map<string, Fractile>();
+    this.fractileMap['SirpinskiTriangle'] = new SirpinskiTriangleFractile();
+    this.fractileMap['FernDots'] = new FernDotFractile();
+    this.fractileMap['FernLines'] = new FernLineFractile();
+    this.fractileMap['Mandelbrot'] = new MandelbrotFractile();
+
   }
-  ngAfterViewInit(): void 
+
+  public stop(): void
   {
+   // alert('hi');
+    globalReferanceToThisComponent.fractileMap[globalReferanceToThisComponent.selectedFractileToDisplay].stop();
+  }
+
+  public ngAfterViewInit(): void 
+  {
+    //use ngAfterViewInit and wait another 50 milliseconds b/c Angular is slow to load
     setTimeout(() => { this.draw(); }, 50);
   }
 
-  public onResize(): void
+  public onresize(): void
   {
-    if (this.mathCanvas != null)
+    if ((typeof globalReferanceToThisComponent.htmlCanvasElement == 'undefined') || (globalReferanceToThisComponent.htmlCanvasElement == null)  )
     {
-      this.mathCanvas.onReize();
+      globalReferanceToThisComponent.htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
     }
+    
+    globalReferanceToThisComponent.htmlCanvasElement.width = window.innerWidth;
+    globalReferanceToThisComponent.htmlCanvasElement.height = window.innerHeight; //call onRelease in ngOnInit if you want it here
+
+    if ((typeof globalReferanceToThisComponent.mathCanvas != 'undefined') && (globalReferanceToThisComponent.mathCanvas != null))
+    {
+      globalReferanceToThisComponent.mathCanvas.onresize();
+    }
+    globalReferanceToThisComponent.fractileMap[globalReferanceToThisComponent.selectedFractileToDisplay].onresize();
   }
 
   ngOnInit(): void 
   {
-    this.selectedFractileToDisplay = 'Mandelbrot';
+    this.selectedFractileToDisplay = 'SirpinskiTriangle';
 
     this.displayForm  = new FormGroup({
       displaySelect: new FormControl(this.selectedFractileToDisplay)
     });
 
-    const htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
+    this.htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
+
+    //commenting out these 2 lines here greatly messes up the scale
+    // this.htmlCanvasElement.width = window.innerWidth;
+    // this.htmlCanvasElement.height = window.innerHeight; //height of visible window  !!!!!! <-- do in onresize?? ...
+
+    window.onresize = this.onresize ;
+
     
-    htmlCanvasElement.width = window.innerWidth;
-    htmlCanvasElement.height = window.innerHeight; //height of visible window  !!!!!! <-- do in OnResize
 
-    window.onresize = this.onResize ;
-
-    this.canvasRenderingContext2D = htmlCanvasElement.getContext('2d') ;
+    this.canvasRenderingContext2D = this.htmlCanvasElement.getContext('2d') ;
     this.mathCanvas = new MathCanvas2D(this.canvasRenderingContext2D);
 
-//    var globalReferanceToThisComponent = this;
+    this.onresize();
 
-    htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCanvas)mathCanvas not working :(
+
+
+this.htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCanvas)mathCanvas not working :(
     {
-      let rect = htmlCanvasElement.getBoundingClientRect();
+      let rect = globalReferanceToThisComponent.htmlCanvasElement.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
       console.log("canvas 2d = x: " + x + " y: " + y );
 
       
-     // let world2D = globalReferanceToThisComponent.mathCanvas.canvasToWorld2D(x,y);
+     // let world2D = globalReferanceToThisComponent.mathCanvas.getRange().canvasToWorld2D(x,y);
      // console.log("world 2d = x: " + world2D.elements[0] + " y: " + world2D.elements[1])
       // console.log('left: ' +rect.left)
       // console.log('top: ' +rect.top)
@@ -89,11 +127,11 @@ export class FractileComponent implements OnInit, AfterViewInit
 
 
 
-    this.fractileMap = new Map<string, Fractile>();
-    this.fractileMap['SirpinskiTriangle'] = new SirpinskiTriangleFractile();
-    this.fractileMap['FernDots'] = new FernDotFractile();
-    this.fractileMap['FernLines'] = new FernLineFractile();
-    this.fractileMap['Mandelbrot'] = new MandelbrotFractile();
+    // this.fractileMap = new Map<string, Fractile>();
+    // this.fractileMap['SirpinskiTriangle'] = new SirpinskiTriangleFractile();
+    // this.fractileMap['FernDots'] = new FernDotFractile();
+    // this.fractileMap['FernLines'] = new FernLineFractile();
+    // this.fractileMap['Mandelbrot'] = new MandelbrotFractile();
 
 
     

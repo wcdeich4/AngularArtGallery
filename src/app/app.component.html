@@ -1,18 +1,36 @@
-<span id="myHamburgerIcon" class="hamburgericon" (click)="openNav()">&#8801;</span>
+<span id="myHamburgerIconId" class="hamburgericon" (click)="openNav()">&#8801;</span>
+<span id="mySettingsGearIconId" class="settingsGearIcon" (click)="openSettings()">
+  <img SRC="../../assets/gear-fill.svg" BORDER=0 width="64x" height="64px" >
+</span>
+
 <label class="titleStyle">William's Art Gallery</label> 
-<!--<span id="myHamburgerIcon" class="sunicon" (click)="openNav()">
+<!--<span id="myHamburgerIconId" class="sunicon" (click)="openNav()">
   <img SRC="../../assets/sun.png" BORDER=0 width="96x" height="96px" >
 </span>-->
 <nav id="mySidenav" class="sidenavMenuStyle">
   <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
   <ul>
     <li><a routerLink="home" (click)="closeNav()">Home&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    <li><a routerLink="zxy" (click)="closeNav()">Z(X,Y) = </a></li>
     <li><a routerLink="fractile" (click)="closeNav()">Fractiles</a></li>
     <li><a routerLink="art2d" (click)="closeNav()">Figure Drawing</a></li>
     <li><a routerLink="photos" (click)="closeNav()">Photos</a></li>
     <li><a routerLink="calculus" (click)="closeNav()">Calculus</a></li>
     <li><a routerLink="about" (click)="closeNav()">About&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
     <li><a routerLink="email" (click)="closeNav()">Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+
+    
+    <!-- works as long as the other website is copied to dist/Tools
+    <li><a href="Tools/index.html">Manual Tools Link Test</a></li>
+    -->
+  </ul>
+</nav>
+
+<nav id="mySettingsNavID" class="sidenavMenuStyle">
+  <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
+  <ul>
+    <li><a href="javascript:void(0)" (click)="resizeElements()">+ font size</a></li>
+
   </ul>
 </nav>
 

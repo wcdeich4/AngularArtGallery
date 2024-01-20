@@ -2,20 +2,20 @@ import { Component, OnInit, SecurityContext } from '@angular/core';
 import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
-import { IMathDrawable } from '../models/IMathDrawable';
-import { MathCanvas2D } from '../models/MathCanvas2D'
-import { SirpinskiTriangleFractile } from '../models/SirpinskiTriangleFractle';
-import { Derivative1 } from '../math/Derivative1';
-import { I2DEquation } from '../math/I2DEquation';
-import { Javascript2DStringEvaluator } from '../math/Javascript2DStringEvaluator';
-import { Vector2D } from '../math/Vector2D';
+import { IMathDrawable } from '../sharedtools/models/IMathDrawable';
+import { MathCanvas2D } from '../sharedtools/models/MathCanvas2D'
+import { SirpinskiTriangleFractile } from '../sharedtools/models/SirpinskiTriangleFractle';
+import { Derivative1 } from '../sharedtools/math/Derivative1';
+import { I2DEquation } from '../sharedtools/math/I2DEquation';
+import { JavascriptStringEvaluator } from '../sharedtools/math/JavascriptStringEvaluator';
+import { RealNumberVector } from '../sharedtools/math/RealNumberVector';
 @Component({
   selector: 'app-canvas2d',
 
   templateUrl: './canvas2d.component.html',
   styleUrls: ['./canvas2d.component.scss'],
   host: {
-    '(window:resize)': 'onResize($event)'
+    '(window:resize)': 'onresize($event)'
   }
 })
 export class Canvas2DComponent implements OnInit 
@@ -30,10 +30,10 @@ export class Canvas2DComponent implements OnInit
     this.location = location;
   }
 
-  onResize(event)
+  onresize(event)
   {
     console.log('new window width: ' + event.target.innerWidth + ' height: ' + event.target.innerHeight);
-    this.mathCanvas.onReize();
+    this.mathCanvas.onresize();
   }
 
   ngOnInit(): void 
@@ -46,24 +46,16 @@ export class Canvas2DComponent implements OnInit
     const htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
     
     htmlCanvasElement.width = window.innerWidth;
-    htmlCanvasElement.height = window.innerHeight; //height of visible window  !!!!!! <-- do in OnResize
+    htmlCanvasElement.height = window.innerHeight; //height of visible window  !!!!!! <-- do in onresize
 
     const canvas = htmlCanvasElement.getContext('2d') ;
     this.mathCanvas = new MathCanvas2D(canvas);
     this.mathCanvas.setRangeValues(-10.0, 10.0, -10.0, 10.0);
-    this.mathCanvas.onReize();
+    this.mathCanvas.onresize();
     
-    this.equation = new Javascript2DStringEvaluator();
+    this.equation = new JavascriptStringEvaluator();
     this.equation.color = 'white';
-/*
-    this.equationText = 'x';
 
-    let javascript2DStringEvaluator: Javascript2DStringEvaluator = this.equation as Javascript2DStringEvaluator;
-
-    javascript2DStringEvaluator.functionOfx = this.equationText;
-
-    this.draw();
-*/
   }
 
   public draw(): void
@@ -79,10 +71,10 @@ export class Canvas2DComponent implements OnInit
   let point2IsCalculatable: boolean = false;
     let x1, y1, x2, y2: number ;
     let xIncrement: number = 0.1;
-    x1 = this.mathCanvas.range.xMin;
+    x1 = this.mathCanvas.getRange().xMin;
     try
     {
-      y1 = this.equation.evaluateAt(x1);
+      y1 = this.equation.evaluateAtX(x1);
       point1IsCalculatable = !isNaN(y1);
     }
     catch (error)
@@ -93,7 +85,7 @@ export class Canvas2DComponent implements OnInit
     console.log("point1IsCalculatable = " + point1IsCalculatable);
     console.log('isNaN(y1) = ' + isNaN(y1));
 
-   // pointQueue.push(new Vector2D(x1, y1));
+   // pointQueue.push(new RealNumberVector(x1, y1));
  
 
  //   const temp = pointQueue.splice(0);
@@ -102,12 +94,12 @@ export class Canvas2DComponent implements OnInit
 
 
  //console.log("pointQueue.length = " + pointQueue.length);
-    while(x1 < this.mathCanvas.range.xMax)
+    while(x1 < this.mathCanvas.getRange().xMax)
     {
       x2 = x1 + xIncrement;
       try
       {
-        y2 = this.equation.evaluateAt(x2);
+        y2 = this.equation.evaluateAtX(x2);
         point2IsCalculatable = !isNaN(y2);
       }
       catch(error)
@@ -141,15 +133,15 @@ export class Canvas2DComponent implements OnInit
 
     //test log Deriv 1
     const d1 = new Derivative1(this.equation, 'red', 0.001);
-   // console.log("Derivative 1 = " + d1.evaluateAt(Math.PI/4));
+   // console.log("Derivative 1 = " + d1.evaluateAtX(Math.PI/4));
 
-    x1 = this.mathCanvas.range.xMin;
-    y1 = d1.evaluateAt(x1);
+    x1 = this.mathCanvas.getRange().xMin;
+    y1 = d1.evaluateAtX(x1);
 
-    while(x1 < this.mathCanvas.range.xMax)
+    while(x1 < this.mathCanvas.getRange().xMax)
     {
       x2 = x1 + xIncrement;
-      y2 = d1.evaluateAt(x2);
+      y2 = d1.evaluateAtX(x2);
       this.mathCanvas.drawLineWorld2D(x1, y1, x2, y2, d1.color);
       x1 = x2;
       y1 = y2;
@@ -166,8 +158,8 @@ export class Canvas2DComponent implements OnInit
 
     if (this.inputForm.controls.equationFormControlName.value != null)
     {
-      let javascript2DStringEvaluator: Javascript2DStringEvaluator = this.equation as Javascript2DStringEvaluator;
-      javascript2DStringEvaluator.functionOfx = this.inputForm.controls.equationFormControlName.value;
+      let JavascriptStringEvaluator: JavascriptStringEvaluator = this.equation as JavascriptStringEvaluator;
+      JavascriptStringEvaluator.functionToEvaluate = this.inputForm.controls.equationFormControlName.value;
       this.mathCanvas.Erase();
       this.draw();
     }
