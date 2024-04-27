@@ -122,7 +122,7 @@ paragraphElements[index].style.fontSize = (fontSize + 1) + 'px';
       this.html2canvasScreenshot();
     }
 
-    console.log(event);
+    //console.log(event);
 
   }
 
