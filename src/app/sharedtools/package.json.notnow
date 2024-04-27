@@ -1,0 +1,26 @@
+{
+  "name": "webpack-demo",
+  "version": "1.0.1",
+  "description": "typescriptwebpac",
+  "scripts": {
+    "build": "webpack --mode=production"
+  },
+  "keywords": [],
+  "author": "Willia Deich",
+  "license": "MIT",
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "typescriptlibrarytest": "git@github.com:wcdeich4/typescriptlibrarytest.git#d633bac6dc6f0d066b7404a58cc2da10a89fbc7b"
+  },
+  "devDependencies": {
+    "file-loader": "^6.2.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.5",
+    "ts-jest": "^29.1.1",
+    "jest": "^29.7.0"
+  }
+}

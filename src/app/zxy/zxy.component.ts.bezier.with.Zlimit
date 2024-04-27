@@ -1,0 +1,396 @@
+import { Component, OnInit, SecurityContext } from '@angular/core';
+import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+import { CrossSiteScriptValidator } from '../sharedtools/models/CrossSiteScriptValidator';
+import { IMathDrawable } from '../sharedtools/models/IMathDrawable';
+import { MathCanvas2D } from '../sharedtools/models/MathCanvas2D'
+import { SirpinskiTriangleFractile } from '../sharedtools/models/SirpinskiTriangleFractle';
+import { Derivative1 } from '../sharedtools/math/Derivative1';
+import { I2DEquation } from '../sharedtools/math/I2DEquation';
+import { JavascriptStringEvaluator } from '../sharedtools/math/JavascriptStringEvaluator';
+import { RealNumberVector } from '../sharedtools/math/RealNumberVector';
+import { Derivative2 } from '../sharedtools/math/Derivative2';
+import { RealNumberMatrix } from '../sharedtools/math/RealNumberMatrix';
+
+@Component({
+  selector: 'app-zxy',
+  providers: [Location, {provide: LocationStrategy, useClass: HashLocationStrategy}],
+  templateUrl: './zxy.component.html',
+  styleUrls: ['./zxy.component.scss'],
+  host: {
+    '(window:resize)': 'onresize($event)'
+  }
+})
+export class ZxyComponent implements OnInit 
+{
+  private equation: JavascriptStringEvaluator;
+  private equation3dTextValidator: CrossSiteScriptValidator;
+  private mathCanvas: MathCanvas2D;
+  private transformMatrix: RealNumberMatrix;
+  private cameraPosition = new RealNumberVector([10, 10, 10]);
+  private focalPoint = new RealNumberVector([0, 0, 0]);
+  private upVector = new RealNumberVector([0, 0, 1]);
+
+  //TODO:  user input range
+  private XLOW: number = -2*Math.PI; 
+  private XHIGH: number = 2*Math.PI;
+  private YLOW: number = -2*Math.PI;
+  private YHIGH: number = 2*Math.PI;
+  private XNumberOfLines: number = 96;
+  private YNumberOfLines: number = 96;
+  private XRES = (this.XHIGH - this.XLOW)/this.XNumberOfLines;
+  private YRES = (this.YHIGH - this.YLOW)/this.YNumberOfLines;
+  private maximumAllowedZ = 1000000;
+  private minimumAllowedZ = -1000000;
+  private P0: RealNumberVector = new RealNumberVector([0, 0, 0]);
+  private P0isValid: boolean;
+  private P1: RealNumberVector = new RealNumberVector([0, 0, 0]);
+  private P1isValid: boolean;
+  private P2: RealNumberVector = new RealNumberVector([0, 0, 0]);
+  private P2isValid: boolean;
+  private P3: RealNumberVector = new RealNumberVector([0, 0, 0]);
+  private P3isValid: boolean;
+  private allValid: boolean;
+  private approximatePerpendicularVector: RealNumberVector = null;
+
+  public inputForm!: FormGroup;
+  public location: Location;
+
+
+  constructor(location: Location)
+  {
+    this.location = location;
+    this.equation = new JavascriptStringEvaluator();
+    this.equation.color = 'green';
+    this.transformMatrix = new RealNumberMatrix();
+  }
+
+  onresize(event): void
+  {
+    console.log('new window width: ' + event.target.innerWidth + ' height: ' + event.target.innerHeight);
+    this.mathCanvas.onresize();
+  }
+
+  ngOnInit(): void 
+  {
+
+    this.equation3dTextValidator = new CrossSiteScriptValidator();
+    this.inputForm  = new FormGroup({
+      equation3dTextBox: new FormControl(
+        null,
+        [Validators.required, this.equation3dTextValidator.containsForbiddenKeyWord /* .bind(this.equation3dTextValidator) not needed if containsForbiddenKeyWord is defined by lambda function */ ],
+        this.equation3dTextValidator.validate
+      )
+    });
+
+    const htmlCanvasElement = document.getElementById('CanvasID') as HTMLCanvasElement;
+
+
+    htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCanvas)
+    {
+      let rect = htmlCanvasElement.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      let world2D = globalReferanceToThisComponent.mathCanvas.getRange().canvasToWorld2D(x,y);
+      console.log("world 2d = x: " + world2D.elements[0] + " y: " + world2D.elements[1])
+
+      
+    }
+    //.addEventListener('click' (event) => {})
+    htmlCanvasElement.width = window.innerWidth;
+    htmlCanvasElement.height = window.innerHeight; //height of visible window  !!!!!! <-- do in onresize
+
+    const canvasContext2d = htmlCanvasElement.getContext('2d') ;
+    this.mathCanvas = new MathCanvas2D(canvasContext2d);
+    this.mathCanvas.setRangeValues(-10.0, 10.0, -10.0, 10.0);
+    this.mathCanvas.onresize();
+
+    var globalReferanceToThisComponent = this;
+
+
+    htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCanvas)
+    {
+      let rect = htmlCanvasElement.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      let world2D = globalReferanceToThisComponent.mathCanvas.getRange().canvasToWorld2D(x,y);
+      console.log("world 2d = x: " + world2D.elements[0] + " y: " + world2D.elements[1])
+
+      
+    }
+    //.addEventListener('click' (event) => {})
+    
+
+
+  }
+
+  public draw(): void
+  {
+    //this.equation3dTextValidator.validate; ??
+
+    
+
+
+
+    //TODO: make setLookAtMatrix inputs class fields
+    this.transformMatrix.setLookAtMatrix(this.cameraPosition, this.focalPoint, this.upVector);
+
+   // this.transformMatrix.log();
+
+    //TODO: use derivative to find interesting lines
+    //      decide what to do for exceptions
+
+   // let Z: number;
+//    let YNext: number;
+    // let this.P0: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    // let this.P1: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    // let this.P2: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    // let this.P3: RealNumberVector = new RealNumberVector([0, 0, 0]);
+    // let this.XRES = (this.XHIGH - this.XLOW)/this.XNumberOfLines;
+    // let YRES = (this.YHIGH - this.YLOW)/this.YNumberOfLines;
+    
+    this.drawLinesInYDirection();
+    this.drawLinesInXDirection();
+
+
+
+  }
+
+
+
+  private drawLinesInYDirection()
+  {
+    
+    for (let X = this.XLOW; X <= this.XHIGH; X += this.XRES)
+    {
+      let Z: number;
+      let Y = this.YLOW;
+      while (Y < this.YHIGH)
+      {
+        this.P0isValid = false;
+        this.P1isValid = false;
+        this.P2isValid = false;
+        this.P3isValid = false;
+        try
+        {
+          Z = this.equation.evaluateAtXY(X, Y);
+          if (Z < this.maximumAllowedZ && Z > this.minimumAllowedZ)
+          {
+            this.P0.set(X, Y, Z);
+            //approximate nnormal vector as point - forcal point
+            this.approximatePerpendicularVector = this.P0.getDifferenceWith(this.focalPoint);
+            //if (this.approximatePerpendicularVector.dotProduct(this.cameraPosition) < 0)
+            {
+              this.P0isValid = true;
+              this.transformMatrix.transformVectorOnRight(this.P0);
+              this.P0.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+            }
+          }
+        }
+        catch (error: any)
+        {
+          console.log('ZXY error:' + error);
+        }
+          
+        try 
+        {
+          Y += this.YRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          if (Z < this.maximumAllowedZ && Z > this.minimumAllowedZ)
+          {
+            this.P1.set(X, Y, Z);
+            //approximate nnormal vector as point - forcal point
+            this.approximatePerpendicularVector = this.P1.getDifferenceWith(this.focalPoint);
+         //   if (this.approximatePerpendicularVector.dotProduct(this.cameraPosition) < 0)
+            {
+              this.P1isValid = true;
+              this.transformMatrix.transformVectorOnRight(this.P1);
+              this.P1.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+            }
+          }
+        }
+        catch (error: any)
+        {
+          console.log('ZXY error:' + error);
+        }
+
+        try
+        {
+          Y += this.YRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          if (Z < this.maximumAllowedZ && Z > this.minimumAllowedZ)
+          {
+            this.P2.set(X, Y, Z);
+            //approximate nnormal vector as point - forcal point
+            this.approximatePerpendicularVector = this.P2.getDifferenceWith(this.focalPoint);
+           // if (this.approximatePerpendicularVector.dotProduct(this.cameraPosition) < 0)
+            {
+              this.P2isValid = true;
+              this.transformMatrix.transformVectorOnRight(this.P2);
+              this.P2.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+            }
+          }
+        }
+        catch (error: any)
+        {
+          console.log('ZXY error:' + error);
+        }
+
+        try
+        {
+          Y += this.YRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          if (Z < this.maximumAllowedZ && Z > this.minimumAllowedZ)
+          {
+            this.P3.set(X, Y, Z);
+            //approximate nnormal vector as point - forcal point
+            this.approximatePerpendicularVector = this.P3.getDifferenceWith(this.focalPoint);
+           // if (this.approximatePerpendicularVector.dotProduct(this.cameraPosition) < 0)
+            {
+              this.P3isValid = true;
+              this.transformMatrix.transformVectorOnRight(this.P3);
+              this.P3.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+            }
+          }
+        }
+        catch (error: any)
+        {
+          console.log('ZXY error:' + error);
+        }
+
+        if (this.P0isValid && this.P1isValid && this.P2isValid && this.P3isValid )
+        {
+          this.mathCanvas.bezierCurveThrough4Points(this.P0, this.P1, this.P2, this.P3, this.equation.color);
+        }
+        else
+        {
+          //points not tranformed!!!!!!!!!!!!
+          if (this.P0isValid && this.P1isValid )
+          {
+            this.mathCanvas.drawLineWorld2D(this.P0.elements[0], this.P0.elements[1], this.P1.elements[0], this.P1.elements[1], this.equation.color);
+          }
+
+          if (this.P2isValid && this.P1isValid )
+          {
+            this.mathCanvas.drawLineWorld2D(this.P2.elements[0], this.P2.elements[1], this.P1.elements[0], this.P1.elements[1], this.equation.color);
+          }
+
+          if (this.P2isValid && this.P3isValid )
+          {
+            this.mathCanvas.drawLineWorld2D(this.P2.elements[0], this.P2.elements[1], this.P3.elements[0], this.P3.elements[1], this.equation.color);
+          }
+
+        }
+
+
+
+
+
+
+
+
+      }
+
+
+    }
+
+  }
+
+
+  private drawLinesInXDirection()
+  {
+    
+    for (let Y = this.YLOW; Y <= this.YHIGH; Y += this.YRES) 
+    {
+      let Z: number;
+      let X = this.XLOW;
+      //  YNext = Y += YRES; //TODO copy ynext instead of adding 2X  ????
+      while (X < this.XHIGH) {
+        try {
+
+          Z = this.equation.evaluateAtXY(X, Y);
+          this.P0.set(X, Y, Z);
+          // console.log('this.P0 pre transform');
+          //this.P0.log();
+         // this.transformMatrix.transformVectorOnRight(this.P0);
+         // this.P0.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+          //console.log('this.P0 post transform');
+          //this.P0.log();
+          X += this.XRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          this.P1.set(X, Y, Z);
+      //    this.transformMatrix.transformVectorOnRight(this.P1);
+       //   this.P1.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+
+          // this.mathCanvas.drawLineWorld2D(this.P0.elements[0],this.P0.elements[1],this.P1.elements[0],this.P1.elements[1], '#FF8000');
+          //  this.P0.set(...this.P1.elements);
+          X += this.XRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          this.P2.set(X, Y, Z);
+        //  this.transformMatrix.transformVectorOnRight(this.P2);
+         // this.P2.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+
+          X += this.XRES / 4;
+          Z = this.equation.evaluateAtXY(X, Y);
+          this.P3.set(X, Y, Z);
+       //   this.transformMatrix.transformVectorOnRight(this.P3);
+       //   this.P3.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+
+          // //   X += this.XRES / 4;
+          // //   this.mathCanvas.drawLineSegmentVertexArrayWorld2D('green', this.P0,this.P1,this.P2,this.P3);
+          this.transformMatrix.transformVectorOnRight(this.P0);
+          this.P0.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+          this.transformMatrix.transformVectorOnRight(this.P1);
+          this.P1.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+          this.transformMatrix.transformVectorOnRight(this.P2);
+          this.P2.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+          this.transformMatrix.transformVectorOnRight(this.P3);
+          this.P3.transformWorld2DToCanvas2DCoordinates(this.mathCanvas.range);
+          this.mathCanvas.bezierCurveThrough4Points(this.P0, this.P1, this.P2, this.P3, 'red');
+
+
+
+
+        }
+        catch (error: any) {
+          console.log('ZXY error:' + error);
+        }
+
+
+
+      }
+
+
+      //Y += YRES;
+    }
+
+  }
+
+  public onInputSubmit(): void
+  {
+    if ((this.inputForm.controls.equation3dTextBox.value != null) && (this.inputForm.controls.equation3dTextBox.errors == null))
+    {
+      let JavascriptStringEvaluator: JavascriptStringEvaluator = this.equation as JavascriptStringEvaluator;
+      JavascriptStringEvaluator.functionToEvaluate = this.inputForm.controls.equation3dTextBox.value;
+
+   //   console.log(this.mathCanvas.getRange().conciseJSON());
+
+      this.mathCanvas.Erase();
+
+      this.draw();
+     // console.log("error: " + this.inputForm.controls.equation3dTextBox.errors);
+     // console.log;
+    }
+
+    else if (this.inputForm.controls.equation3dTextBox.errors?.equation3dTextBoxIsInvalid)
+    {
+      alert('Do not inject cross site scripts into the equation text box'); 
+    }
+
+
+
+  }
+
+
+}
