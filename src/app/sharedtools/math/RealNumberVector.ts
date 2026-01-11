@@ -82,16 +82,44 @@ export class RealNumberVector extends GenericVector<number> implements ICloneabl
     // 3D Methods
 
     /**
-     * 
+     * use the current vector as the eye/camera, and test if it can see a face for backface culling. Optimized for 3D. Temporary arrays save memory though reuse.
      * @param {Array<RealNumberVector>} faceVertexArray 
-     * @param {Array<number>} temporaryArray1 
-     * @param {Array<number>} temporaryArray2 
+     * @param {Array<number>} temporaryDifferenceArray1 
+     * @param {Array<number>} temporaryDifferenceArray2 
+     * @param {Array<number>} temporaryCrossProductArray 
      * @returns {boolean}
      */
-    public canSee(faceVertexArray: Array<RealNumberVector>, temporaryArray1: Array<number>, temporaryArray2: Array<number>): boolean
+    public canSee(faceVertexArray: Array<RealNumberVector>, temporaryDifferenceArray1: Array<number>, temporaryDifferenceArray2: Array<number>, temporaryCrossProductArray: Array<number>): boolean
     {
-        temporaryArray1[0] = faceVertexArray[1].elements[0] - faceVertexArray[0].elements[0];
-        throw new Error('not implemented');
+        //unrolled loop subtraction
+        //faceVertexArray[1] - faceVertexArray[0]
+        temporaryDifferenceArray1[0] = faceVertexArray[1].elements[0] - faceVertexArray[0].elements[0];
+        temporaryDifferenceArray1[1] = faceVertexArray[1].elements[1] - faceVertexArray[0].elements[1];
+        temporaryDifferenceArray1[2] = faceVertexArray[1].elements[2] - faceVertexArray[0].elements[2];
+
+        //faceVertexArray[2] - faceVertexArray[1]
+        temporaryDifferenceArray2[0] = faceVertexArray[2].elements[0] - faceVertexArray[1].elements[0];
+        temporaryDifferenceArray2[1] = faceVertexArray[2].elements[1] - faceVertexArray[1].elements[1];
+        temporaryDifferenceArray2[2] = faceVertexArray[2].elements[2] - faceVertexArray[1].elements[2];
+
+        RealNumberVector.crossProductArrays(temporaryDifferenceArray1, temporaryDifferenceArray2, temporaryCrossProductArray);
+
+        //dot product unrolled
+        return 0 <= this.elements[0] * temporaryCrossProductArray[0] + this.elements[1] * temporaryCrossProductArray[1]  + this.elements[2] * temporaryCrossProductArray[2]; 
+
+    }
+
+    /**
+     * static method for cross product with number arrays.
+     * @param {Array<number>} vectorArray1 
+     * @param {Array<number>} vectorArray2 
+     * @param {Array<number>} resultArray 
+     */
+    public static crossProductArrays(vectorArray1: Array<number>, vectorArray2: Array<number>, resultArray: Array<number>): void
+    {
+        resultArray[0] = vectorArray1[1] * vectorArray2[2] - vectorArray1[2] * vectorArray2[1] ;
+        resultArray[1] = vectorArray1[2] * vectorArray2[0] - vectorArray1[0] * vectorArray2[2] ;
+        resultArray[2] = vectorArray1[0] * vectorArray2[1] - vectorArray1[1] * vectorArray2[0] ;
     }
 
     /**
@@ -101,11 +129,14 @@ export class RealNumberVector extends GenericVector<number> implements ICloneabl
      */
     public crossProduct(otherVector: GenericVector<number>): RealNumberVector
     {
-       // throw new Error('wrong for homogenous vectors because they need an extra 1???????????????????????????????????');
+        const resultArray = new Array<number>(3);
+        RealNumberVector.crossProductArrays(this.elements, otherVector.elements, resultArray);
+        return new RealNumberVector(resultArray);
+    //    // throw new Error('wrong for homogenous vectors because they need an extra 1???????????????????????????????????');
 
-        return new RealNumberVector([this.elements[1] * otherVector.elements[2] - this.elements[2] * otherVector.elements[1] ,
-                            this.elements[2] * otherVector.elements[0] - this.elements[0] * otherVector.elements[2] ,
-                            this.elements[0] * otherVector.elements[1] - this.elements[1] * otherVector.elements[0]]);
+    //     return new RealNumberVector([this.elements[1] * otherVector.elements[2] - this.elements[2] * otherVector.elements[1] ,
+    //                         this.elements[2] * otherVector.elements[0] - this.elements[0] * otherVector.elements[2] ,
+    //                         this.elements[0] * otherVector.elements[1] - this.elements[1] * otherVector.elements[0]]);
     }
 
     //other methods

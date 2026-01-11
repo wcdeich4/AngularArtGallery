@@ -51,9 +51,33 @@ export class FractileComponent implements OnInit, AfterViewInit
 
   }
 
+  public saveCanvas(): void
+  {
+    let filename = 'Canvas.png';
+    let canvasDataURL = this.htmlCanvasElement.toDataURL('image/png');
+    /* Change MIME type to trick the browser to downlaod the file instead of displaying it */
+    canvasDataURL = canvasDataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
+  
+    /* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
+    canvasDataURL = canvasDataURL.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=' + filename);
+  
+//    window.document.href = canvasDataURL; ?????
+
+
+let a = document.createElement('a'); 
+a.href = canvasDataURL;
+//a.download = 'Canvas.png';
+a.download = filename;
+document.body.appendChild(a);
+a.click();
+URL.revokeObjectURL(canvasDataURL);
+
+
+
+  }
+
   public stop(): void
   {
-   // alert('hi');
     globalReferanceToThisComponent.fractileMap[globalReferanceToThisComponent.selectedFractileToDisplay].stop();
   }
 
@@ -145,6 +169,9 @@ this.htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCa
     this.mathCanvas.setRange(this.fractileMap[this.selectedFractileToDisplay].range);
   //  this.mathCanvas.AutoScaleWidthToMatchHeight(); //kinda worked, but not what was desired
 
+
+/* // turn off overlay temp
+
     //texture uv origin is upper lefthand corner like images
     var XTextureCoordinatePercent0 = 0, YTextureCoordinatePercent0 = 0;
     var XTextureCoordinatePercent1 = 1, YTextureCoordinatePercent1 = 0;
@@ -181,7 +208,7 @@ this.htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCa
     var delta_c = u0*v1*x2 + v0*x1*u2 + x0*u1*v2 - x0*v1*u2 - v0*u1*x2 - u0*x1*v2;
     var delta_d = y0*v1 + v0*y2 + y1*v2 - v1*y2 - v0*y1 - y0*v2;
     var delta_e = u0*y1 + y0*u2 + u1*y2 - y1*u2 - y0*u1 - u0*y2;
-    var delta_f = u0*v1*y2 + v0*y1*u2 + y0*u1*v2 - y0*v1*u2 - v0*u1*y2 - u0*y1*v2;1
+    var delta_f = u0*v1*y2 + v0*y1*u2 + y0*u1*v2 - y0*v1*u2 - v0*u1*y2 - u0*y1*v2;
 
         // a*u0 + b*v0 + c = x0
         // a*u1 + b*v1 + c = x1
@@ -197,7 +224,7 @@ this.htmlCanvasElement.onclick = function(event: MouseEvent) //.bind(this.mathCa
     this.canvasRenderingContext2D.drawImage(this.overlayImageElement , 0, 0);
     this.canvasRenderingContext2D.restore();
 
-
+//*/
 
     if (!this.fractileMap[this.selectedFractileToDisplay].calculated)
     {

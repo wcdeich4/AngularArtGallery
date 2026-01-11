@@ -162,17 +162,27 @@ export class MathCanvas2D
         
     }
 
-    /* not working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - actually did work, just did not produce desired results*/
+
+
+    public AutoScaleHeightToMatchWidth(): void
+    {
+        let heightOverWidth: number =  this.canvasRenderingContext2D.canvas.height / this.canvasRenderingContext2D.canvas.width; 
+        this.range.yMax *= heightOverWidth;
+        this.range.yMin *= heightOverWidth;
+
+        //TODO: handle non-centered ranges
+        this.onresize(); 
+    }
+
+
+
     public AutoScaleWidthToMatchHeight(): void
     {
         //TODO: handle non-centered ranges
-            let widthOverHeight: number = this.canvasRenderingContext2D.canvas.width / this.canvasRenderingContext2D.canvas.height; 
-            this.range.xMax = this.range.yMax * widthOverHeight  ;
-            this.range.xMin = this.range.yMin * widthOverHeight ;
-
-
-
-        this.onresize();  //??????????
+        let widthOverHeight: number = this.canvasRenderingContext2D.canvas.width / this.canvasRenderingContext2D.canvas.height; 
+        this.range.xMax = this.range.yMax * widthOverHeight  ;
+        this.range.xMin = this.range.yMin * widthOverHeight ;
+        this.onresize();
     }
     
 
@@ -250,8 +260,8 @@ export class MathCanvas2D
     /**
      * draw line segment array of verticies in world 2D
      * For speed sake, no safety checks are done
-     * @param {...Array<GenericVector<number>>} vertexArray Array of GenericVector<number>
      * @param {string | CanvasGradient | CanvasPattern} color stroke style
+     * @param {...Array<GenericVector<number>>} vertexArray Array of GenericVector<number>
      */
     public drawLineSegmentVertexArrayWorld2D(color: string | CanvasGradient | CanvasPattern, ...vertexArray: Array<GenericVector<number>>): void
     {
@@ -262,6 +272,94 @@ export class MathCanvas2D
             this.drawLineWorld2D(vertexArray[i].elements[0], vertexArray[i].elements[1], vertexArray[i + 1].elements[0], vertexArray[i + 1].elements[1], color);
         }
     }
+
+
+
+
+    public drawImageVarArgCanvasXY(image: HTMLImageElement, ...vertexArray: Array<GenericVector<number>>): void
+    {
+
+
+    //texture uv origin is upper lefthand corner like images
+    var XTextureCoordinatePercent0 = 0, YTextureCoordinatePercent0 = 0;
+    var XTextureCoordinatePercent1 = 1, YTextureCoordinatePercent1 = 0;
+    var XTextureCoordinatePercent2 = 1, YTextureCoordinatePercent2 = 1;
+
+    var u0 = XTextureCoordinatePercent0*image.width, 
+    v0 = YTextureCoordinatePercent0*image.height;
+    var x0 = vertexArray[0].elements[0]; 
+    var y0 = vertexArray[0].elements[1];
+    var u1 = XTextureCoordinatePercent1*image.width, 
+    v1 = YTextureCoordinatePercent1*image.height;
+    var x1 = vertexArray[1].elements[0]; 
+    var y1 = vertexArray[1].elements[1];
+    var u2 = XTextureCoordinatePercent2*image.width, 
+    v2 = YTextureCoordinatePercent2*image.height;
+    var x2 = vertexArray[2].elements[0];
+    var y2 = vertexArray[2].elements[1];
+
+  //  var x3 = 10, 
+   // y3 = 310;
+
+    this.canvasRenderingContext2D.save();
+    this.canvasRenderingContext2D.beginPath();
+
+   // this.canvasX1 = this.range.world2DXtoCanvasX(vertexArray[0].elements[0]);
+  //  this.canvasY1 = this.range.world2DYtoCanvasY(vertexArray[0].elements[1]);
+
+   // vertexArray[0].transformWorld2DToCanvas2DCoordinates(this.range) //Property 'transformWorld2DToCanvas2DCoordinates' does not exist on type 'GenericVector<number>'.ts(2339)
+
+    this.canvasRenderingContext2D.moveTo(vertexArray[0].elements[0], vertexArray[0].elements[1]);
+    for(let i = 1; i < vertexArray.length; i ++ )
+    {
+        this.canvasRenderingContext2D.lineTo(vertexArray[i].elements[0], vertexArray[i].elements[1]);
+        //console.log(vertexArray[i].toString());
+    }
+    this.canvasRenderingContext2D.closePath();
+    this.canvasRenderingContext2D.clip();
+
+
+//    var delta = u0*v1 + v0*u2 + u1*v2 - v1*u2 - v0*u1 - u0*v2;
+    // var delta_a = x0*v1 + v0*x2 + x1*v2 - v1*x2 - v0*x1 - x0*v2;
+    // var delta_b = u0*x1 + x0*u2 + u1*x2 - x1*u2 - x0*u1 - u0*x2;
+    // var delta_c = u0*v1*x2 + v0*x1*u2 + x0*u1*v2 - x0*v1*u2 - v0*u1*x2 - u0*x1*v2;
+    // var delta_d = y0*v1 + v0*y2 + y1*v2 - v1*y2 - v0*y1 - y0*v2;
+    // var delta_e = u0*y1 + y0*u2 + u1*y2 - y1*u2 - y0*u1 - u0*y2;
+    // var delta_f = u0*v1*y2 + v0*y1*u2 + y0*u1*v2 - y0*v1*u2 - v0*u1*y2 - u0*y1*v2;
+    // // a*u0 + b*v0 + c = x0
+    // // a*u1 + b*v1 + c = x1
+    // // a*u2 + b*v2 + c = x2
+    // // d*u0 + e*v0 + f = y0
+    // // d*u1 + e*v1 + f = y1
+    // // d*u2 + e*v2 + f = y2
+
+
+    //   // TODO: eliminate common subexpressions.
+      var denom = u0 * (v2 - v1) - u1 * v2 + u2 * v1 + (u1 - u2) * v0;
+      if (denom == 0) {
+        console.error("denom = 0 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      }
+      var m11 = - (v0 * (x2 - x1) - v1 * x2 + v2 * x1 + (v1 - v2) * x0) / denom;
+      var m12 = (v1 * y2 + v0 * (y1 - y2) - v2 * y1 + (v2 - v1) * y0) / denom;
+      var m21 = (u0 * (x2 - x1) - u1 * x2 + u2 * x1 + (u1 - u2) * x0) / denom;
+      var m22 = - (u1 * y2 + u0 * (y1 - y2) - u2 * y1 + (u2 - u1) * y0) / denom;
+      var dx = (u0 * (v2 * x1 - v1 * x2) + v0 * (u1 * x2 - u2 * x1) + (u2 * v1 - u1 * v2) * x0) / denom;
+      var dy = (u0 * (v2 * y1 - v1 * y2) + v0 * (u1 * y2 - u2 * y1) + (u2 * v1 - u1 * v2) * y0) / denom;
+
+
+      //  console.log("delta_a = " + delta_a);
+//   this.canvasRenderingContext2D.transform(delta_a/delta, delta_d/delta,delta_b/delta, delta_e/delta,delta_c/delta, delta_f/delta);
+//    this.canvasRenderingContext2D.drawImage(image , 0, 0);
+
+this.canvasRenderingContext2D.transform(m11, m12, m21, m22, dx, dy);
+this.canvasRenderingContext2D.drawImage(image , 0, 0);
+
+
+    this.canvasRenderingContext2D.restore();
+
+    }
+
+
 
     /**
      * draw line in World 2D coordinates

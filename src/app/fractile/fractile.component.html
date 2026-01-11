@@ -1,4 +1,10 @@
 <form [formGroup]="displayForm" class="displaySelectFormStyle" (ngSubmit)="onDisplayChange()" >
+
+
+    <button   type="button" class="displaySlectElementStyle" (click)="saveCanvas()">
+        Save
+        </button>
+
     <button   type="button" class="displaySlectElementStyle" (click)="stop()">
         <img src="../../assets/stop.png" alt="Stop" class="displaySlectElementStyle"  />  
         </button>
@@ -9,9 +15,8 @@
         <option value="Mandelbrot">Mandelbrot</option>
     </select>
 <button  type="submit" class="displaySlectElementStyle" >Draw</button>
-
 </form>
-
+<img src="../../assets/BarnsleyFern.png" />
 <canvas id="CanvasID"></canvas>
 
 
