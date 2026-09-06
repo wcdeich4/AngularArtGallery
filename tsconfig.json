@@ -1,8 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
     "strict": false,
@@ -11,10 +9,8 @@
     "noFallthroughCasesInSwitch": false,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2017",
     "module": "es2020",

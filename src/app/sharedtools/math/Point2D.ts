@@ -88,4 +88,7 @@ export class Point2D extends EquatableWithTolerance
             return false;
         }
     }
+    
+    //TODO: Point3D
+    //        ToColumnMatrix function
 }

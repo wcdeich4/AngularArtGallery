@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 export class CrossSiteScriptValidator implements AsyncValidator
 {
   //TODO: put in .json config file
-    public ForbiddenKeyWords: Array<string> = ['xhr', 'asdf', 'fetch', 'http', 'ftp', 'promise', 'then'];
+    public ForbiddenKeyWords: Array<string> = ['xhr', '\\\\', 'fetch', 'http', 'ftp', 'promise', 'then'];
 
     /**
      * test if string contains forbidden keyword

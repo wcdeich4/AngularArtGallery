@@ -40,10 +40,10 @@ export class RealNumberMatrix extends GenericMatrix<number> implements ICloneabl
      * create look at matrix like in OpenGL, except row-major math is the default.
      * https://www.geertarien.com/blog/2017/07/30/breakdown-of-the-lookAt-function-in-OpenGL
      * https://medium.com/@carmencincotti/lets-look-at-magic-lookat-matrices-c77e53ebdf78
-     * @param cameraPosition {RealNumberVector} camera poisition in 3D cartesian coordinates
-     * @param focalPoint {RealNumberVector} point to look at in 3D cartesian coordinates
-     * @param upVector {RealNumberVector} up vector in 3D cartesian coordinates (approximate is ok)
-     * @param columnMajor {boolean}
+     * @param {RealNumberVector} cameraPosition camera poisition in 3D cartesian coordinates
+     * @param {RealNumberVector} focalPoint point to look at in 3D cartesian coordinates
+     * @param {RealNumberVector} upVector up vector in 3D cartesian coordinates (approximate is ok)
+     * @param {boolean} columnMajor
      */
     public setLookAtMatrix(cameraPosition: RealNumberVector, focalPoint: RealNumberVector, upVector: RealNumberVector, columnMajor: boolean = false ): void
     {
